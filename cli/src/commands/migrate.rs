@@ -10,7 +10,7 @@ pub async fn run_migration(
         MigrateDirection::Up => "up",
         MigrateDirection::Down => "down",
     };
-    println!("Running migration {} with {} steps", direction_str, steps);
+    println!("Running migration {direction_str} with {steps} steps");
     println!("Note: Migration functionality not yet implemented");
     println!("This would typically use sea-orm-migration crate");
     Ok(())
