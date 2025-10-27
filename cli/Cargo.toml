@@ -1,0 +1,17 @@
+[package]
+name = "minoa-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "minoa-cli"
+path = "src/main.rs"
+
+[dependencies]
+minoa = { path = "../minoa" }
+sea-orm = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+prettytable-rs = { workspace = true }
+chrono = { workspace = true }
+anyhow = { workspace = true }

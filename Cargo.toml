@@ -1,5 +1,18 @@
 [workspace]
 resolver = "2"
-members = [
-  "minoa"
-]
+members = ["cli", "minoa", "migration"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+sea-orm = { version = "1.1", features = [
+    "sqlx-postgres",
+    "runtime-tokio-native-tls",
+] }
+tokio = { version = "1", features = ["full"] }
+clap = { version = "4.5", features = ["derive", "env"] }
+prettytable-rs = "0.10"
+chrono = "0.4"
+anyhow = "1.0"
