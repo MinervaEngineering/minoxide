@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["cli", "minoa"]
+members = ["cli", "minoa", "migration"]
 
 [workspace.package]
 version = "0.1.0"

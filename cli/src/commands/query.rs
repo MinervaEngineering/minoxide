@@ -1,4 +1,3 @@
-use minoa::postgres::prelude::*;
 use prettytable::{format, Cell, Row, Table};
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, QuerySelect};
 
@@ -15,7 +14,7 @@ pub async fn list_players(db: &DatabaseConnection, limit: Option<u64>) -> Result
         .order_by_asc(Column::PlayerId)
         .all(db)
         .await
-        .map_err(|e| format!("Failed to fetch players: {}", e))?;
+        .map_err(|e| format!("Failed to fetch players: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
@@ -62,7 +61,7 @@ pub async fn list_games(
         .order_by_desc(Column::GameId)
         .all(db)
         .await
-        .map_err(|e| format!("Failed to fetch games: {}", e))?;
+        .map_err(|e| format!("Failed to fetch games: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
@@ -118,7 +117,7 @@ pub async fn list_backtests(
         .order_by_desc(Column::Id)
         .all(db)
         .await
-        .map_err(|e| format!("Failed to fetch backtests: {}", e))?;
+        .map_err(|e| format!("Failed to fetch backtests: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
@@ -166,7 +165,7 @@ pub async fn list_backtest_summaries(
         .order_by_desc(Column::Id)
         .all(db)
         .await
-        .map_err(|e| format!("Failed to fetch backtest summaries: {}", e))?;
+        .map_err(|e| format!("Failed to fetch backtest summaries: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
@@ -217,7 +216,7 @@ pub async fn list_contests(
     let contests = query
         .all(db)
         .await
-        .map_err(|e| format!("Failed to fetch contests: {}", e))?;
+        .map_err(|e| format!("Failed to fetch contests: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
@@ -232,11 +231,11 @@ pub async fn list_contests(
     for contest in &contests {
         table.add_row(Row::new(vec![
             Cell::new(&contest.contest_id),
-            Cell::new(&contest.contest_name.as_ref().unwrap_or(&"N/A".to_string())),
+            Cell::new(contest.contest_name.as_ref().unwrap_or(&"N/A".to_string())),
             Cell::new(
                 &contest
                     .entry_fee
-                    .map_or("N/A".to_string(), |f| format!("${:.2}", f)),
+                    .map_or("N/A".to_string(), |f| format!("${f:.2}")),
             ),
             Cell::new(
                 &contest
@@ -246,7 +245,7 @@ pub async fn list_contests(
             Cell::new(
                 &contest
                     .prize_pool
-                    .map_or("N/A".to_string(), |p| format!("${}", p)),
+                    .map_or("N/A".to_string(), |p| format!("${p}")),
             ),
         ]));
     }

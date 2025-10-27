@@ -1,6 +1,5 @@
-use minoa::postgres::prelude::*;
 use prettytable::{format, Cell, Row, Table};
-use sea_orm::{ConnectionTrait, DatabaseConnection, EntityTrait, QuerySelect, Statement};
+use sea_orm::{ConnectionTrait, DatabaseConnection, EntityTrait, Statement};
 
 pub async fn show_table_counts(db: &DatabaseConnection) -> Result<(), String> {
     let mut table = Table::new();
@@ -29,7 +28,7 @@ pub async fn show_table_counts(db: &DatabaseConnection) -> Result<(), String> {
     ];
 
     for table_name in table_names {
-        let sql = format!("SELECT COUNT(*) FROM {}", table_name);
+        let sql = format!("SELECT COUNT(*) FROM {table_name}");
         match db
             .query_one(Statement::from_string(
                 sea_orm::DatabaseBackend::Postgres,
@@ -41,15 +40,15 @@ pub async fn show_table_counts(db: &DatabaseConnection) -> Result<(), String> {
                 if let Ok(count) = result.try_get_by_index::<i64>(0) {
                     table.add_row(Row::new(vec![
                         Cell::new(table_name),
-                        Cell::new(&format!("{:>12}", count)),
+                        Cell::new(&format!("{count:>12}")),
                     ]));
                 }
             }
             Ok(None) => {
-                eprintln!("Warning: No result for {}", table_name);
+                eprintln!("Warning: No result for {table_name}");
             }
             Err(e) => {
-                eprintln!("Warning: Failed to count {}: {}", table_name, e);
+                eprintln!("Warning: Failed to count {table_name}: {e}");
             }
         }
     }
@@ -74,7 +73,7 @@ pub async fn show_backtest_stats(
     let summaries = query
         .all(db)
         .await
-        .map_err(|e| format!("Failed to fetch backtest stats: {}", e))?;
+        .map_err(|e| format!("Failed to fetch backtest stats: {e}"))?;
 
     if summaries.is_empty() {
         println!("No backtest summaries found.");
@@ -106,19 +105,19 @@ pub async fn show_backtest_stats(
     ]));
     table.add_row(Row::new(vec![
         Cell::new("Total Profit"),
-        Cell::new(&format!("${}", total_profit)),
+        Cell::new(&format!("${total_profit}")),
     ]));
     table.add_row(Row::new(vec![
         Cell::new("Total Cost"),
-        Cell::new(&format!("${}", total_cost)),
+        Cell::new(&format!("${total_cost}")),
     ]));
     table.add_row(Row::new(vec![
         Cell::new("Total Prizes"),
-        Cell::new(&format!("${}", total_prizes)),
+        Cell::new(&format!("${total_prizes}")),
     ]));
     table.add_row(Row::new(vec![
         Cell::new("Average ROI"),
-        Cell::new(&format!("{:.2}%", avg_roi)),
+        Cell::new(&format!("{avg_roi:.2}%")),
     ]));
     table.add_row(Row::new(vec![
         Cell::new("Total 1st Places"),
@@ -151,17 +150,16 @@ pub async fn show_player_stats(db: &DatabaseConnection, min_games: i32) -> Resul
         LEFT JOIN hitter_game hg ON p.player_id = hg.player_id
         LEFT JOIN pitcher_game pg ON p.player_id = pg.player_id
         GROUP BY p.player_id, p.player_name
-        HAVING COUNT(DISTINCT hg.game_id) >= {} OR COUNT(DISTINCT pg.game_id) >= {}
+        HAVING COUNT(DISTINCT hg.game_id) >= {min_games} OR COUNT(DISTINCT pg.game_id) >= {min_games}
         ORDER BY (COUNT(DISTINCT hg.game_id) + COUNT(DISTINCT pg.game_id)) DESC
         LIMIT 50
-        "#,
-        min_games, min_games
+        "#
     );
 
     let results = db
         .query_all(Statement::from_string(DbBackend::Postgres, sql))
         .await
-        .map_err(|e| format!("Failed to fetch player stats: {}", e))?;
+        .map_err(|e| format!("Failed to fetch player stats: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);
@@ -207,7 +205,7 @@ pub async fn show_database_size(db: &DatabaseConnection) -> Result<(), String> {
     let result = db
         .query_one(Statement::from_string(DbBackend::Postgres, sql.to_string()))
         .await
-        .map_err(|e| format!("Failed to fetch database size: {}", e))?;
+        .map_err(|e| format!("Failed to fetch database size: {e}"))?;
 
     if let Some(row) = result {
         let db_size: String = row
@@ -218,8 +216,8 @@ pub async fn show_database_size(db: &DatabaseConnection) -> Result<(), String> {
         println!("┌─────────────────────────────────────┐");
         println!("│  Database Size Information          │");
         println!("├─────────────────────────────────────┤");
-        println!("│  Total Size: {:<22} │", db_size);
-        println!("│  Size (bytes): {:<20} │", db_size_bytes);
+        println!("│  Total Size: {db_size:<22} │");
+        println!("│  Size (bytes): {db_size_bytes:<20} │");
         println!("└─────────────────────────────────────┘");
         println!();
     }
@@ -242,7 +240,7 @@ pub async fn show_database_size(db: &DatabaseConnection) -> Result<(), String> {
             table_sql.to_string(),
         ))
         .await
-        .map_err(|e| format!("Failed to fetch table sizes: {}", e))?;
+        .map_err(|e| format!("Failed to fetch table sizes: {e}"))?;
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_BOX_CHARS);

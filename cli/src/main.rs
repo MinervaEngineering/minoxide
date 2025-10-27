@@ -18,6 +18,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Init database schema
+    Db {
+        #[command(subcommand)]
+        action: DbCommands,
+    },
     /// Query database tables
     Query {
         #[command(subcommand)]
@@ -51,6 +56,21 @@ enum Commands {
         /// Run full validation including foreign keys
         #[arg(short, long)]
         full: bool,
+    },
+}
+
+#[derive(Subcommand)]
+enum DbCommands {
+    /// Create all tables from minoa entities
+    Create,
+
+    /// Check existing database schema
+    Check,
+
+    /// Drop all tables in the database
+    Drop {
+        #[arg(long)]
+        confirm: bool,
     },
 }
 
@@ -140,6 +160,13 @@ async fn main() {
     };
 
     let result = match cli.command {
+        Commands::Db { action } => match action {
+            DbCommands::Create => commands::db::create_schema(&cli.database_url).await,
+            DbCommands::Check => commands::db::check_schema(&cli.database_url).await,
+            DbCommands::Drop { confirm } => {
+                commands::db::drop_schema(&cli.database_url, confirm).await
+            }
+        },
         Commands::Query { query_type } => handle_query(&db, query_type).await,
         Commands::Stats { stats_type } => handle_stats(&db, stats_type).await,
         Commands::Migrate { direction, steps } => handle_migrate(&db, direction, steps).await,
