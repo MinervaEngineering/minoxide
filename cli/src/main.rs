@@ -154,7 +154,7 @@ async fn main() {
     let db = match Database::connect(&cli.database_url).await {
         Ok(db) => db,
         Err(err) => {
-            eprintln!("Error connecting to database: {}", err);
+            eprintln!("Error connecting to database: {err}");
             process::exit(1);
         }
     };
@@ -175,7 +175,7 @@ async fn main() {
     };
 
     if let Err(err) = result {
-        eprintln!("Error: {}", err);
+        eprintln!("Error: {err}");
         process::exit(1);
     }
 }
