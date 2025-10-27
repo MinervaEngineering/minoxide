@@ -1,0 +1,29 @@
+{{ if .Values.ares.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ares-deployment
+  namespace: default
+spec:
+  replicas: {{ .Values.ares.min_replicas }}
+  selector:
+    matchLabels:
+      app: ares-worker
+  template:
+    metadata:
+      labels:
+        app: ares-worker
+    spec:
+      containers:
+      - name: ares-worker
+        image: {{ .Values.ares.image }}
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: {{ .Values.ares.config.resources.requests.memory }}
+            cpu: {{ .Values.ares.config.resources.requests.cpu }}
+        envFrom:
+          - configMapRef:
+              name: ares-configmap
+        command: ["julia", "--project=.", "scripts/start_rabbit_worker.jl"]
+{{ end }}

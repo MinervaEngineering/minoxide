@@ -1,0 +1,39 @@
+ares:
+  enabled: false
+  image: registry.minerva.lan:5000/ares.jl/juliaworker:latest
+  configmap:
+    gonerva_host: http://gonerva-service:80
+    rabbit_host: rabbitmq-service
+    rabbit_port: 5672
+    rabbit_virtual_host: "/"
+  config:
+    min_replicas: 1
+    max_replicas: 10
+    resources:
+      requests:
+        memory: "1000Mi"
+        cpu: "1000m"
+      limits:
+        memory: "1000Mi"
+        cpu: "1000m"
+postgresql:
+  enabled: false
+  auth:
+    username: minoa
+    password: minoa123
+    database: minoa
+    postgresPassword: postgres123
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+  metrics:
+    enabled: false

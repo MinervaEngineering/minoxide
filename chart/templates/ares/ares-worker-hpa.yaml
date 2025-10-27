@@ -1,0 +1,20 @@
+{{ if .Values.ares.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ares-worker-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ares-deployment
+  minReplicas: {{ .Values.ares.config.min_replicas }}
+  maxReplicas: {{ .Values.ares.config.max_replicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 25
+{{ end }}

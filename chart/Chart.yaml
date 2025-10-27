@@ -1,0 +1,10 @@
+apiVersion: v2
+name: minerva
+description: A Helm chart for all Minerva Applications
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  - name: postgresql
+    version: "18.1.1"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
